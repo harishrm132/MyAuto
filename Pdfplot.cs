@@ -45,7 +45,6 @@ namespace MyAuto
             String BlockName = "SHEETGOST";
             String PrinterName = "DWG To PDF.pc3";
             String PaperSize = "ISO_A4_(210.00_x_297.00_MM)";
-            //String PaperSize = "ISO_A4_(297.00_x_210.00_MM)";
             //String PaperSize = "ISO_A3_(297.00_x_420.00_MM)";
             String OutPath = "c:\\temp\\plot2pdf";
 
@@ -129,11 +128,12 @@ namespace MyAuto
                                 PlotSettingsValidator psv = PlotSettingsValidator.Current;
                                 psv.SetPlotWindowArea(ps, window);
                                 psv.SetPlotType(ps, Autodesk.AutoCAD.DatabaseServices.PlotType.Window);
-                                psv.SetUseStandardScale(ps, true);
+                                psv.SetUseStandardScale(ps, false);
                                 psv.SetStdScaleType(ps, StdScaleType.ScaleToFit);
                                 psv.SetPlotCentered(ps, true);
                                 psv.SetPlotConfigurationName(ps, PrinterName, PaperSize);
                                 psv.SetZoomToPaperOnUpdate(ps, true);
+                                psv.SetPlotRotation(ps, PlotRotation.Degrees270);
 
                                 pi.OverrideSettings = ps;
                                 piv.Validate(pi);
