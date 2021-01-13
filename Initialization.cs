@@ -174,9 +174,9 @@ namespace MyAuto
             int curRow = 1;
             myWS.cells(curRow, "A").value = HostApplicationServices.WorkingDatabase.OriginalFileName;
             curRow += 1;
-            foreach (string myName in GetBlockNames(db))
+            foreach (string myName in BlockUtils.GetBlockNames(db))
             {
-                foreach (ObjectId myBrefID in GetBlockIDs(db, myName))
+                foreach (ObjectId myBrefID in BlockUtils.GetBlockIDs(db, myName))
                 {
                     myWS.cells(curRow, "A").value = myBrefID.ToString();
                     myWS.cells(curRow, "B").value = myName;
@@ -194,7 +194,7 @@ namespace MyAuto
                     }
                     curRow += 1;
 
-                    foreach (KeyValuePair<string, string> myKVP in GetAttributes(myBrefID))
+                    foreach (KeyValuePair<string, string> myKVP in BlockUtils.GetAttributes(myBrefID))
                     {
                         myWS.cells(curRow, "J").value = myKVP.Key;
                         myWS.cells(curRow, "K").value = myKVP.Value;
@@ -224,12 +224,12 @@ namespace MyAuto
             Database dbToUse = HostApplicationServices.WorkingDatabase;
             System.IO.StreamWriter mySW = new System.IO.StreamWriter(myFIO.FullName);
             mySW.WriteLine(HostApplicationServices.WorkingDatabase.Filename);
-            foreach (string myName in GetBlockNames(dbToUse))
+            foreach (string myName in BlockUtils.GetBlockNames(dbToUse))
             {
-                foreach (ObjectId myBrefID in GetBlockIDs(dbToUse, myName))
+                foreach (ObjectId myBrefID in BlockUtils.GetBlockIDs(dbToUse, myName))
                 {
                     mySW.WriteLine(" " + myName);
-                    foreach (KeyValuePair<string, string> myKVP in GetAttributes(myBrefID))
+                    foreach (KeyValuePair<string, string> myKVP in BlockUtils.GetAttributes(myBrefID))
                     {
                         mySW.WriteLine(" " + myKVP.Key + " " + myKVP.Value);
                     }
@@ -317,83 +317,6 @@ namespace MyAuto
                 myTrans.Commit();
             }
         }
-
-
-        List<string> GetBlockNames(Database DBIn)
-        {
-            List<string> retList = new List<string>();
-            using (Transaction myTrans = DBIn.TransactionManager.StartTransaction())
-            {
-                BlockTable myBT = (BlockTable)DBIn.BlockTableId.GetObject(OpenMode.ForRead);
-                foreach (ObjectId myOID in myBT)
-                {
-                    BlockTableRecord myBTR = (BlockTableRecord)myOID.GetObject(OpenMode.ForRead);
-                    if (myBTR.IsLayout == false | myBTR.IsAnonymous == false)
-                    {
-                        retList.Add(myBTR.Name);
-                    }
-                }
-            }
-            return (retList);
-        }
-
-        ObjectIdCollection GetBlockIDs(Database DBIn, string BlockName)
-        {
-            ObjectIdCollection retCollection = new ObjectIdCollection();
-            using (Transaction myTrans = DBIn.TransactionManager.StartTransaction())
-            {
-                BlockTable myBT = (BlockTable)DBIn.BlockTableId.GetObject(OpenMode.ForRead);
-                if (myBT.Has(BlockName))
-                {
-                    BlockTableRecord myBTR = (BlockTableRecord)myBT[BlockName].GetObject(OpenMode.ForRead);
-                    retCollection = (ObjectIdCollection)myBTR.GetBlockReferenceIds(true, true);
-                    myTrans.Commit();
-                    return (retCollection);
-                }
-                else
-                {
-                    myTrans.Commit();
-                    return (retCollection);
-                }
-            }
-        }
-
-        Dictionary<string, string> GetAttributes(ObjectId BlockRefID)
-        {
-            Dictionary<string, string> retDictionary = new Dictionary<string, string>();
-            using (Transaction myTrans = BlockRefID.Database.TransactionManager.StartTransaction())
-            {
-                BlockReference myBref = (BlockReference)BlockRefID.GetObject(OpenMode.ForRead);
-                if (myBref.AttributeCollection.Count == 0)
-                {
-                    return (retDictionary);
-                }
-                else
-                {
-                    foreach (ObjectId myBRefID in myBref.AttributeCollection)
-                    {
-                        AttributeReference myAttRef = (AttributeReference)myBRefID.GetObject(OpenMode.ForRead);
-                        if (retDictionary.ContainsKey(myAttRef.Tag) == false)
-                        {
-                            retDictionary.Add(myAttRef.Tag, myAttRef.TextString); //prompt
-                        }
-                    }
-                    return (retDictionary);
-                }
-            }
-        }
-
-        Dictionary<double, double> GetCoordinates(ObjectId BlockRefID)
-        {
-            Dictionary<double, double> retDictionary = new Dictionary<double, double>();
-            using (Transaction myTrans = BlockRefID.Database.TransactionManager.StartTransaction())
-            {
-                BlockReference myBref = (BlockReference)BlockRefID.GetObject(OpenMode.ForRead);
-                retDictionary.Add(myBref.Position.X, myBref.Position.Y);
-                return retDictionary;
-            }
-        }
-
 
     }
 }

@@ -10,6 +10,16 @@ using Autodesk.AutoCAD.PlottingServices;
 using Autodesk.AutoCAD.Runtime;
 using ACAD = Autodesk.AutoCAD.ApplicationServices.Application;
 using ED = Autodesk.AutoCAD.EditorInput.Editor;
+
+/*It's very common to need to execute some code as your application modules are loaded, 
+and then to clean-up as they get unloaded or as AutoCAD terminates. 
+Managed AutoCAD applications can do this by implementing the Autodesk.AutoCAD.Runtime.IExtensionApplication interface, 
+which require Initialize() and Terminate() methods.
+
+During the Initialize() method, you will typically want to set system variables and perhaps call commands which 
+execute some pre-existing initialization code for your application.*/
+//https://through-the-interface.typepad.com/through_the_interface/2006/09/initialization_.html
+
 namespace MyAuto
 {
     public class Pdfplot : IExtensionApplication

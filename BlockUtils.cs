@@ -104,5 +104,81 @@ namespace MyAuto
                 tr.AddNewlyCreatedDBObject(attRef, true);
             }
         }
+
+        public static List<string> GetBlockNames(Database DBIn)
+        {
+            List<string> retList = new List<string>();
+            using (Transaction myTrans = DBIn.TransactionManager.StartTransaction())
+            {
+                BlockTable myBT = (BlockTable)DBIn.BlockTableId.GetObject(OpenMode.ForRead);
+                foreach (ObjectId myOID in myBT)
+                {
+                    BlockTableRecord myBTR = (BlockTableRecord)myOID.GetObject(OpenMode.ForRead);
+                    if (myBTR.IsLayout == false | myBTR.IsAnonymous == false)
+                    {
+                        retList.Add(myBTR.Name);
+                    }
+                }
+            }
+            return (retList);
+        }
+
+        public static ObjectIdCollection GetBlockIDs(Database DBIn, string BlockName)
+        {
+            ObjectIdCollection retCollection = new ObjectIdCollection();
+            using (Transaction myTrans = DBIn.TransactionManager.StartTransaction())
+            {
+                BlockTable myBT = (BlockTable)DBIn.BlockTableId.GetObject(OpenMode.ForRead);
+                if (myBT.Has(BlockName))
+                {
+                    BlockTableRecord myBTR = (BlockTableRecord)myBT[BlockName].GetObject(OpenMode.ForRead);
+                    retCollection = (ObjectIdCollection)myBTR.GetBlockReferenceIds(true, true);
+                    myTrans.Commit();
+                    return (retCollection);
+                }
+                else
+                {
+                    myTrans.Commit();
+                    return (retCollection);
+                }
+            }
+        }
+
+        public static Dictionary<string, string> GetAttributes(ObjectId BlockRefID)
+        {
+            Dictionary<string, string> retDictionary = new Dictionary<string, string>();
+            using (Transaction myTrans = BlockRefID.Database.TransactionManager.StartTransaction())
+            {
+                BlockReference myBref = (BlockReference)BlockRefID.GetObject(OpenMode.ForRead);
+                if (myBref.AttributeCollection.Count == 0)
+                {
+                    return (retDictionary);
+                }
+                else
+                {
+                    foreach (ObjectId myBRefID in myBref.AttributeCollection)
+                    {
+                        AttributeReference myAttRef = (AttributeReference)myBRefID.GetObject(OpenMode.ForRead);
+                        if (retDictionary.ContainsKey(myAttRef.Tag) == false)
+                        {
+                            retDictionary.Add(myAttRef.Tag, myAttRef.TextString); //prompt
+                        }
+                    }
+                    return (retDictionary);
+                }
+            }
+        }
+
+        public static Dictionary<double, double> GetCoordinates(ObjectId BlockRefID)
+        {
+            Dictionary<double, double> retDictionary = new Dictionary<double, double>();
+            using (Transaction myTrans = BlockRefID.Database.TransactionManager.StartTransaction())
+            {
+                BlockReference myBref = (BlockReference)BlockRefID.GetObject(OpenMode.ForRead);
+                retDictionary.Add(myBref.Position.X, myBref.Position.Y);
+                return retDictionary;
+            }
+        }
+
     }
 }
