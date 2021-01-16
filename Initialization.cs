@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACAD = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -24,7 +25,7 @@ namespace MyAuto
             var myWS = myExcel.ActiveSheet;
             int lastUsedRow = Convert.ToInt32(myWS.cells(1, "M").value);
 
-            Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            Document doc = ACAD.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
             Editor ed = doc.Editor;
@@ -119,7 +120,7 @@ namespace MyAuto
         [CommandMethod("AddBlockTest")] static public void AddBlockTest()
         {
 
-            Database db = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Database;
+            Database db = ACAD.DocumentManager.MdiActiveDocument.Database;
             using (Transaction myTrans = db.TransactionManager.StartTransaction())
             {
                 //Get the block definition "Check".
@@ -241,7 +242,7 @@ namespace MyAuto
 
         [CommandMethod("MergeBlocks")] public static void MergeBlocks()
         {
-            Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+            Document doc = ACAD.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
             Editor ed = doc.Editor;

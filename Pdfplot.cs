@@ -22,7 +22,7 @@ execute some pre-existing initialization code for your application.*/
 
 namespace MyAuto
 {
-    public class Pdfplot : IExtensionApplication
+    public class Pdfplot /*: IExtensionApplication*/
     {
         [DllImport("accore.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "acedTrans")]
         static extern int acedTrans(double[] point, IntPtr fromRb, IntPtr toRb, int disp, double[] result);
@@ -34,21 +34,21 @@ namespace MyAuto
             public Layout LayoutObj;
         }
 
-        public void Terminate()
-        {
-            ApplicationEventManager cadWinEvnts = Autodesk.AutoCAD.Internal.Reactors.ApplicationEventManager.Instance();
-            msgs.Sort();
-            ED ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
-            foreach (string msg in msgs)
-            {
-                ed.WriteMessage(msg);
-            }
-        }
+        //public void Terminate()
+        //{
+        //    ApplicationEventManager cadWinEvnts = Autodesk.AutoCAD.Internal.Reactors.ApplicationEventManager.Instance();
+        //    msgs.Sort();
+        //    ED ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
+        //    foreach (string msg in msgs)
+        //    {
+        //        ed.WriteMessage(msg);
+        //    }
+        //}
 
-        public void Initialize()
-        {
+        //public void Initialize()
+        //{
 
-        }
+        //}
 
         [CommandMethod("PlotToPdf")] static public void PlotToPdf()
         {
