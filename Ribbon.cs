@@ -23,6 +23,7 @@ namespace MyAuto
         // CustomizationSection
         // cs - main AutoCAD CUI file
         CustomizationSection cs;
+        Editor ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
 
         //This bool is used to determine when to save the cui
         //If running the callForAllChanges(), only want to call saveCui at the end
@@ -38,19 +39,16 @@ namespace MyAuto
             RibbonRoot ribbonRoot = cs.MenuGroup.RibbonRoot;
             RibbonTabSourceCollection tabs = ribbonRoot.RibbonTabSources;
             RibbonTabSource tab = ribbonRoot.FindTab(TabName + "_TabSourceID");
-            if (tab != null) { /*DeleteTab((string)ACAD.GetSystemVariable("WSCURRENT"), TabName, PanelName);*/ }
-            else { CreateRibbonTabAndPanel_Method(); }
+            if (tab == null) { DeleteTab((string)ACAD.GetSystemVariable("WSCURRENT"), TabName, PanelName); CreateRibbonTabAndPanel_Method(); }
             CreateStartupCommands();
         }
 
         public void Terminate() { }
 
         [CommandMethod("CreateRibbonTabAndPanel")] public void CreateRibbonTabAndPanel_Method()
-        {
-            Editor ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
+        {       
             try
             {
-                //cs = new CustomizationSection((string)ACAD.GetSystemVariable("MENUNAME"));
                 string curWorkspace = (string)ACAD.GetSystemVariable("WSCURRENT");
                 CreateRibbonTabAndPanel(cs, curWorkspace, TabName, PanelName);
                 RibbonPanelSource panelSrc = GetRibbonPanel(cs, PanelName);
@@ -78,8 +76,6 @@ namespace MyAuto
 
                 if (bSaveCui) { SaveCUI(curWorkspace); }
                 ed.WriteMessage(Environment.NewLine + "Menu Created");
-
-
             }
             catch (System.Exception ex)
             {
@@ -123,7 +119,6 @@ namespace MyAuto
         {
             WSRibbonRoot wrkSpaceRibbonRoot = null;
             WorkspaceRibbonTabCollection wsRibbonTabCollection = null;
-            Editor ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
 
             try
             {
@@ -155,25 +150,12 @@ namespace MyAuto
                 }
 
                 RibbonRoot ribbonRoot = cs.MenuGroup.RibbonRoot;
-                RibbonTabSourceCollection tabs = null;
-                tabs = ribbonRoot.RibbonTabSources;
-
+                RibbonTabSourceCollection tabs = ribbonRoot.RibbonTabSources;
 
                 // Change this to the name of the  // tab to be removed
-                string strRibTabSrcTabId = null;
-
-                foreach (RibbonTabSource ribTabSrc in tabs)
-                {
-                    if (ribTabSrc.Name != null)
-                    {
-                        if (ribTabSrc.Name.ToString() == strRibTabSrcName)
-                        {
-                            strRibTabSrcTabId = ribTabSrc.ElementID.ToString();
-                            break;
-                        }
-                    }
-                }
-
+                RibbonTabSource ribTabSrc = ribbonRoot.FindTab(strRibTabSrcName + "_TabSourceID");
+                string strRibTabSrcTabId = ribTabSrc.ElementID.ToString();
+                //Remove From workspace based on eleament ID
                 foreach (WSRibbonTabSourceReference wsTabRef in wsRibbonTabCollection)
                 {
                     if (wsTabRef.TabId.ToString() == strRibTabSrcTabId)
@@ -267,9 +249,9 @@ namespace MyAuto
                     //Add to Ribbon Tab
                     rtab.Panels.Add(Rpanel);
                 }
-
-
+                else { ed.WriteMessage(Environment.NewLine + "Ribbon Tab not found!!"); }
             }
+            else { ed.WriteMessage(Environment.NewLine + "Ribbon Control not found!!"); }
         }
 
         static Windo.RibbonPanel AddPanel(Windo.RibbonPanelSource ribbonPanelSource)
