@@ -33,32 +33,36 @@
   <ItemGroup>
     <Reference Include="AcCoreMgd">
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcCoreMgd.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AcCui, Version=24.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcCui.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AcDbMgd">
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcDbMgd.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AcMgd">
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcMgd.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AcWindows">
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AcWindows.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Autodesk\ObjectARX_for_AutoCAD_2021_Win_64bit_dlm\inc\AdWindows.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,6 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockUtils.cs" />
+    <Compile Include="Blockview.xaml.cs">
+      <DependentUpon>Blockview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Initialization.cs" />
     <Compile Include="Pdfplot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -133,6 +140,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icons8-export-excel-96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Blockview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

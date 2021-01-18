@@ -18,17 +18,22 @@ namespace MyAuto
     {
         [CommandMethod("Insert_Block_usingexcel")] public void Insert_Block_usingexcel()
         {
-            string _path = "D:\\Videos & docs\\CAD\\AutoCAD\\Lynda AutoCAD Add-ins Using VB.NET_git.ir\\Exercise Files\\MyAuto\\Output.xlsx";
+            Document doc = ACAD.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+            Database db = doc.Database;
+            Editor ed = doc.Editor;
+            
+            //WPF Window - Open Block Input Files
+            var dialog = new Blockview();
+            var result = ACAD.ShowModalWindow(dialog);
+            if (!result.Value) { ed.WriteMessage(dialog.UserName + "\n" + "FILE NOT EXIST!!!"); return; }
+            
+            string _path = dialog.UserName;
             Microsoft.Office.Interop.Excel.Application myExcel = new Microsoft.Office.Interop.Excel.Application();
             myExcel.Visible = false;
             var myWB = myExcel.Workbooks.Open(_path);
             var myWS = myExcel.ActiveSheet;
             int lastUsedRow = Convert.ToInt32(myWS.cells(1, "M").value);
-
-            Document doc = ACAD.DocumentManager.MdiActiveDocument;
-            if (doc == null) return;
-            Database db = doc.Database;
-            Editor ed = doc.Editor;
 
             using (Transaction myTrans = db.TransactionManager.StartTransaction())
             {

@@ -1,0 +1,19 @@
+﻿<Window x:Class="MyAuto.Blockview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MyAuto"
+             mc:Ignorable="d" 
+             d:DesignHeight="160" d:DesignWidth="500" Height="160" Width="500">
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Margin="5">Choose File:</Label>
+        <TextBox x:Name="nameBox" Grid.Row="1" Margin="10,5,10,5" IsEnabled="False" Background="LightYellow" />
+        <Button x:Name="okButton" Grid.Row="2" Margin="10" HorizontalAlignment="Center" Content="Browse" Height="24" Width="80" Click="okButton_Click"/>
+    </Grid>
+</Window>
