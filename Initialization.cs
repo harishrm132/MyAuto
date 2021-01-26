@@ -96,7 +96,7 @@ namespace MyAuto
             myWB = null;
             myExcel = null;
         }
-
+        
         [CommandMethod("InsertDWGblock")] public void InsertDWGblock()
         {
             const string filename = @"F:\gile\TestDrawing.dwg";
