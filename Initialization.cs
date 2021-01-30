@@ -324,5 +324,46 @@ namespace MyAuto
             }
         }
 
+        [CommandMethod("ADDATTREF")] public static void AddAttributeReference()
+        {
+            var doc = ACAD.DocumentManager.MdiActiveDocument;
+            var db = doc.Database;
+            var ed = doc.Editor;
+
+            // display a dialog box to get the attribute value
+            string attValue;
+            using (var dialog = new AttributeValueDialog())
+            {
+                if (ACAD.ShowModalDialog(dialog) != System.Windows.Forms.DialogResult.OK)
+                    return;
+                attValue = dialog.AttributeValue;
+            }
+
+            // prompts the user to select a block reference
+            var peo = new PromptEntityOptions("\nSelect block reference: ");
+            peo.SetRejectMessage("\nSelected object is not a block reference.");
+            peo.AddAllowedClass(typeof(BlockReference), true);
+            var per = ed.GetEntity(peo);
+            if (per.Status != PromptStatus.OK)
+                return;
+
+            // prompts the user to specify the attribute insertion point
+            var ppr = ed.GetPoint("\nSpecify the attribute insertion point: ");
+            if (ppr.Status != PromptStatus.OK)
+                return;
+            var insPoint = ppr.Value.TransformBy(ed.CurrentUserCoordinateSystem);
+
+            // create the attribute reference and add it to the attribute collection of the selected block
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var br = (BlockReference)tr.GetObject(per.ObjectId, OpenMode.ForWrite);
+                var attRef = new AttributeReference(insPoint, attValue, "TAG", db.Textstyle)
+                { LockPositionInBlock = false };
+                br.AttributeCollection.AppendAttribute(attRef);
+                tr.AddNewlyCreatedDBObject(attRef, true);
+                tr.Commit();
+            }
+        }
+
     }
 }
