@@ -24,7 +24,7 @@ namespace MyAuto
             Editor ed = doc.Editor;
             
             //WPF Window - Open Block Input Files
-            var dialog = new Blockview();
+            var dialog = new Blockview("Excel files (*.xlsx,*.xls)|*.xlsx;*.xls|All files (*.*)|*.*");
             var result = ACAD.ShowModalWindow(dialog);
             if (!result.Value) { ed.WriteMessage(dialog.UserName + "\n" + "FILE NOT EXIST!!!"); return; }
             
@@ -99,6 +99,17 @@ namespace MyAuto
         
         [CommandMethod("InsertDWGblock")] public void InsertDWGblock()
         {
+            Document doc = ACAD.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+            Editor ed = doc.Editor;
+
+            //WPF Window - Open Block Input Files
+            var dialog = new Blockview("Excel files (*.dwg,*.dwt)|*.dwg;*.dwt|All files (*.*)|*.*");
+            var result = ACAD.ShowModalWindow(dialog);
+            if (!result.Value) { ed.WriteMessage(dialog.UserName + "\n" + "FILE NOT EXIST!!!"); return; }
+
+            string _path = dialog.UserName;
+
             const string filename = @"F:\gile\TestDrawing.dwg";
             Scale3d Scale = new Scale3d(1, 1, 1);
 
@@ -120,6 +131,56 @@ namespace MyAuto
                 }
                 db.SaveAs(filename, DwgVersion.Current);
             }
+        }
+
+        [CommandMethod("CopyblocksfmDWG")] public void CopyblocksfmDWG()
+        {
+            DocumentCollection dm = ACAD.DocumentManager;
+            Editor ed = dm.MdiActiveDocument.Editor;
+            Database destDb = dm.MdiActiveDocument.Database;
+            Database sourceDb = new Database(false, true);
+
+            //WPF Window - Open Block Input Files
+            var dialog = new Blockview("Excel files (*.dwg,*.dwt)|*.dwg;*.dwt|All files (*.*)|*.*");
+            var result = ACAD.ShowModalWindow(dialog);
+            if (!result.Value) { ed.WriteMessage(dialog.UserName + "\n" + "FILE NOT EXIST!!!"); return; }
+            string _path = dialog.UserName;
+
+            try
+            {
+                //Read DWG into side database
+                sourceDb.ReadDwgFile(_path, System.IO.FileShare.Read, true, "");
+
+                //Create variable to store list of block identifiers
+                ObjectIdCollection blockIds = new ObjectIdCollection();
+
+                Autodesk.AutoCAD.DatabaseServices.TransactionManager tm = sourceDb.TransactionManager;
+                using (Transaction sourceTrans = tm.StartTransaction())
+                {
+                    // Open the block table
+                    BlockTable bt = (BlockTable)tm.GetObject(sourceDb.BlockTableId, OpenMode.ForRead, false);
+                    // Check each block in the block table
+                    foreach (ObjectId btrID in bt)
+                    {
+                        BlockTableRecord btr = (BlockTableRecord)tm.GetObject(btrID, OpenMode.ForRead, false);
+                        // Only add named & non-layout blocks to the copy list
+                        if (!btr.IsAnonymous && !btr.IsLayout) blockIds.Add(btrID);
+                        btr.Dispose();
+                    }
+                }
+
+                //Copy block from Source database to Destination database
+                IdMapping idMapping = new IdMapping();
+                sourceDb.WblockCloneObjects(blockIds, destDb.BlockTableId, idMapping, DuplicateRecordCloning.Replace, false);
+
+                ed.WriteMessage("\nCopied "  + blockIds.Count.ToString()  + " block definitions from "  
+                    + _path  + " to the current drawing."); 
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            {
+                ed.WriteMessage("\nError during copy: " + ex.Message);
+            }
+            sourceDb.Dispose();
         }
 
         [CommandMethod("AddBlockTest")] static public void AddBlockTest()

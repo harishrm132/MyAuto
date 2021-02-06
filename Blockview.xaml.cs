@@ -20,18 +20,20 @@ namespace MyAuto
     /// </summary>
     public partial class Blockview : Window
     {
-        public Blockview()
+        public Blockview(string _Filter)
         {
             InitializeComponent();
+            Filter = _Filter;
         }
 
         public string UserName => nameBox.Text;
+        string Filter = "";
 
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
             // Create OpenFileDialog
             Microsoft.Win32.OpenFileDialog openFileDlg = new Microsoft.Win32.OpenFileDialog();
-            openFileDlg.Filter = "Excel files (*.xlsx,*.xls)|*.xlsx;*.xls|All files (*.*)|*.*";
+            openFileDlg.Filter = Filter;
 
             // Launch OpenFileDialog by calling ShowDialog method
             Nullable<bool> result = openFileDlg.ShowDialog();
