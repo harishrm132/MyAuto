@@ -231,7 +231,7 @@ namespace MyAuto
             } //Trans Finish
         }
 
-        [CommandMethod("ExportBlockDetails_Excel")] public void ExportBlockDetails_Excel()  
+        [CommandMethod("ExportBlockDetails_Excel")] public void ExportBlockDetails_Excel()
         { //Delete all blocks(like that line....)
             Microsoft.Office.Interop.Excel.Application myExcel = new Microsoft.Office.Interop.Excel.Application();
             myExcel.Visible = false;
@@ -385,7 +385,7 @@ namespace MyAuto
             }
         }
 
-        [CommandMethod("ADDATTREF")] public static void AddAttributeReference()
+        [CommandMethod("AddAttributeReference")] public static void AddAttributeReference()
         {
             var doc = ACAD.DocumentManager.MdiActiveDocument;
             var db = doc.Database;
@@ -426,5 +426,51 @@ namespace MyAuto
             }
         }
 
+        [CommandMethod("AccessDynamicProps")] static public void AccessDynamicBlockProps()
+        {
+            Document doc = ACAD.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor ed = doc.Editor;
+
+            PromptStringOptions pso = new PromptStringOptions("\n Enter DynamicBlock name or enter to select: ");
+            pso.AllowSpaces = true;
+            PromptResult pr = ed.GetString(pso);
+            if (pr.Status != PromptStatus.OK) return;
+
+            using(Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                BlockReference br = null;
+
+                //If Prompt ressult is NULL string
+                if(pr.StringResult == "")
+                {
+                    //Select a block reference
+                    PromptEntityOptions peo = new PromptEntityOptions("\n select dynamic block: ");
+                    peo.SetRejectMessage("\n Entity is not a block");
+                    peo.AddAllowedClass(typeof(BlockReference), false);
+                    PromptEntityResult per = ed.GetEntity(peo);
+                    if (per.Status != PromptStatus.OK) return;
+
+                    //Access the selected block reference
+                    br = tr.GetObject(per.ObjectId, OpenMode.ForRead) as BlockReference;
+                }
+                else
+                {
+                    //Otherwise we have to lookup for the block by name
+                    BlockTable bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    if (!bt.Has(pr.StringResult)) { ed.WriteMessage("\n Block" + pr.StringResult + "doesn't exist"); return; }
+
+                    //Create a new block reference referring to the block
+                    br = new BlockReference(new Point3d(), bt[pr.StringResult]);
+                }
+
+                BlockTableRecord btr = tr.GetObject(br.DynamicBlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                //Call the Function to display block properties
+                BlockUtils.DisplayDynBlockProperties(ed, br, btr.Name);
+                tr.Commit();
+            } 
+        }
+
+        
     }
 }

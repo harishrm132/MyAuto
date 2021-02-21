@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using System;
@@ -102,6 +103,33 @@ namespace MyAuto
                 }
                 target.AttributeCollection.AppendAttribute(attRef);
                 tr.AddNewlyCreatedDBObject(attRef, true);
+            }
+        }
+
+        public static void DisplayDynBlockProperties(Editor ed, BlockReference br, string name)
+        {
+            if (br != null && br.IsDynamicBlock)
+            {
+                ed.WriteMessage("\nDynamic properties for \"{0}\"\n", name);
+                // Get the dynamic block's property collection
+                DynamicBlockReferencePropertyCollection pc = br.DynamicBlockReferencePropertyCollection;
+                foreach (DynamicBlockReferenceProperty prop in pc)
+                {
+                    //Start with property name, type and description
+                    ed.WriteMessage("\n Property: \"{0}\" : {1}", prop.PropertyName, prop.UnitsType);
+                    if (prop.Description != "") { ed.WriteMessage("\n Description: {0}", prop.Description); }
+                    if (prop.ReadOnly) { ed.WriteMessage("\n (Read Only) "); }
+                    // Get the allowed values, if it's constrained
+                    bool IsFirst = true;
+                    foreach (object value in prop.GetAllowedValues())
+                    {
+                        ed.WriteMessage((IsFirst ? "\n  Allowed values: [" : ", "));
+                        ed.WriteMessage("\"{0}\"", value);
+                        IsFirst = false;
+                    }
+                    if (!IsFirst) { ed.WriteMessage("]"); }
+                    ed.WriteMessage("\n current value: \"{0}\"\n");
+                }
             }
         }
 
