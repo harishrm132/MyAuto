@@ -471,6 +471,28 @@ namespace MyAuto
             } 
         }
 
-        
+        [CommandMethod("PickCirclePoints", CommandFlags.Modal)] public void PickCirclePoints()
+        {
+            Editor ed = ACAD.DocumentManager.MdiActiveDocument.Editor;
+            try
+            {
+                using (PointCollector ptCol = new PointCollector(PointCollector.Shape.Circle))
+                {
+                    ptCol.Collect();
+
+                    int i = 0;
+                    foreach (Point3d pt in ptCol.CollectedPoints)
+                    {
+                        ed.WriteMessage(string.Format("\nCollected point #{0}: {1}", ++i, pt.ToString()));
+                    }
+
+                }
+            }
+            catch (System.Exception ex)
+            {
+                ed.WriteMessage(Environment.NewLine + ex.Message);
+            }
+        }
+
     }
 }
