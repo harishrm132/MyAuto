@@ -29,7 +29,7 @@ namespace MyAuto
         //If running the callForAllChanges(), only want to call saveCui at the end
         bool bSaveCui = true;
 
-        String TabName = "Talon_Codes";
+        String TabName = "Fenix_Codes";
         String PanelName = "Initialization";
 
         public void Initialize()

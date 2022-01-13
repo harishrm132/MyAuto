@@ -98,6 +98,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Ribbon.cs" />
+    <Compile Include="Selectionsets.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AttributeValueDialog.resx">
